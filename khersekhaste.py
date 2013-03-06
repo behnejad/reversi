@@ -7,7 +7,7 @@ from kivy.app import App
 from kivy.uix.widget import Widget
 from kivy.graphics import Color, Ellipse, Line, Rectangle
 from kivy.properties import ObjectProperty
-from board import Board, move_string, print_moves, get_legal_moves
+from board import Board, move_string, print_moves
 
 
 # a simple solution for the data. not the brightest one. anyone who wants
@@ -15,8 +15,8 @@ from board import Board, move_string, print_moves, get_legal_moves
 
 class RandomEngine:
 	
-	def moving(self, board, color, move_num):#time_remaining=None, time_opponent=None)
-		return random.choice(get_legal_moves(color))
+	def moving(self, board, color):#time_remaining=None, time_opponent=None)
+		return random.choice(self.board.get_legal_moves(color))
 
 class KherseKhasteWidget(Widget):
 
@@ -28,15 +28,15 @@ class KherseKhasteWidget(Widget):
     board = Board() #the game board
     AI_engine = RandomEngine() #!!
 	
-	def get_AI_next_move(self, engine, board, color, move_num):
-		engine.moving(board,color,move_num)
+    def get_AI_next_move(self, engine, board, color):
+        self.engine.moving(board,color,move_num)
 	
     def update_screen(self):
         '''updated the screen'''
         #we redraw everything at each update so that the game can support them rotation of the device
         with self.canvas:
             self.canvas.clear()
-            #TODO: this is just a placeholder. load the board from an image file.
+            #TODO: this is just a placeholder. load the board from an image file. --- Reza ---
             for j in range(7,-1,-1):
                 for i in range(8):
                     Color(0.2, 0.85, 0.2)
