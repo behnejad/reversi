@@ -14,9 +14,8 @@ from board import Board, move_string, print_moves
 # something else should do it himself.
 
 class RandomEngine:
-	
-	def moving(self, board, color):#time_remaining=None, time_opponent=None)
-		return random.choice(self.board.get_legal_moves(color))
+    def moving(self, board, color):#time_remaining=None, time_opponent=None)
+        return random.choice(board.get_legal_moves(color))
 
 class KherseKhasteWidget(Widget):
 
@@ -29,7 +28,7 @@ class KherseKhasteWidget(Widget):
     AI_engine = RandomEngine() #!!
 	
     def get_AI_next_move(self, engine, board, color):
-        self.engine.moving(board,color,move_num)
+        return engine.moving(board,color)
 	
     def update_screen(self):
         '''updated the screen'''
@@ -60,17 +59,38 @@ class KherseKhasteWidget(Widget):
         if (self.mode == 0): #both are humans
             if ((x, y) in self.board.get_legal_moves(self.current)):
                 self.board.execute_move((x, y), self.current)
-                if (len(self.board.get_legal_moves(1)) == 0 and len(self.board.get_legal_moves(1)) == 0):
+                if (len(self.board.get_legal_moves(1)) == 0 and len(self.board.get_legal_moves(-1)) == 0):
                     exit()
                 if (len(self.board.get_legal_moves(-self.current)) != 0):
                     self.current = - self.current
                 self.update_screen()
+        elif(self.mode == 1):
+            if ((x, y) in self.board.get_legal_moves(self.current)):
+                self.board.execute_move((x, y), self.current)
+                if (len(self.board.get_legal_moves(1)) == 0 and len(self.board.get_legal_moves(-1)) == 0):
+                    exit()
+                if (len(self.board.get_legal_moves(-self.current)) != 0):
+                    self.current = - self.current
+                self.update_screen()
+                while 1:
+                    self.board.execute_move(self.get_AI_next_move(self.AI_engine, self.board, (-1)), self.current)
+                    if (len(self.board.get_legal_moves(1)) == 0 and len(self.board.get_legal_moves(-1)) == 0):
+                        exit()
+                    self.update_screen()
+                    if (len(self.board.get_legal_moves(-self.current)) != 0):
+                        self.current = - self.current
+                        break
+
     
     def on_touch_down(self, touch):
         '''handles the touch event'''
         if (not self.started):
             self.started = True
             self.current = 1
+            if (touch.y / self.size[1] < 0.5):
+                self.mode=0
+            else:
+                self.mode=1
             self.update_screen()
         else:
             self.translate_touch(touch)
