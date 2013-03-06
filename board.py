@@ -154,7 +154,9 @@ class Board():
         flips = []
 
         for x, y in Board._increment_move(origin, direction):
-            if self[x][y] == 0 and flips:
+            if self[x][y] == 0 and len(flips) == 0:
+                return None
+            elif self[x][y] == 0 and flips:
                 return (x, y)
             elif self[x][y] == color:
                 return None 
@@ -166,12 +168,15 @@ class Board():
         execute_move function """
         #initialize variables
         flips = [origin]
-
         for x, y in Board._increment_move(origin, direction):
             if self[x][y] == -color:
                 flips.append((x, y))
             elif self[x][y] == color and len(flips) > 1:
                 return flips
+            elif self[x][y] == color and len(flips) <= 1:
+                return []
+            elif self[x][y] == 0:
+                return []
 
         return []
 
