@@ -11,12 +11,11 @@ from kivy.properties import ObjectProperty
 from board import Board, move_string, print_moves
 from kivy.uix.image import Image
 
-
 class RandomEngine:
     def moving(self, board, color, moves):
         return random.choice(moves)
 
-class Easy_AI:
+class Easy_AI: #gharche kheng
     def moving(self, board, color, moves):
         l = moves
         for i in l:
@@ -30,16 +29,55 @@ class Easy_AI:
                 return (7,0)
         return random.choice(l)
 
+class Normal_AI: #maare divooneh
+    def moving(self, board, color, moves):
+        score = []
+        for move in moves:
+            mscore = 0
+            new_board = deepcopy(board)
+            new_board.execute_move(move, color)
+            mscore += new_board.count(color) - board.count(color)
+            if (move == (0,0) or move == (0,7) or move == (7,0) or move == (7,7)):
+                mscore += 16
+            if (move[0] == 0 or move[0] == 7 or move[1] == 0 or move[1] == 7):
+                mscore += 8
+            new_moves = new_board.get_legal_moves(-color)
+            very_bad = [(0,0),(0,7),(7,0),(7,7)]
+            for n in very_bad:
+                if (n in new_moves):
+                    mscore -= 10
+            bad = deepcopy(very_bad)
+            for i in [1,2,3,4,5,6]:
+                bad.append((0,i))
+                bad.append((7,i))
+                bad.append((i,0))
+                bad.append((i,7))
+            for n in bad:
+                if (n in new_moves):
+                    mscore -= 2
+            if (len(new_moves) == 0):
+                mscore += 24
+            mscore -= int(len(new_moves) / 5)
+            score.append(mscore)
+        return moves[score.index(max(score))]
+    
 class KherseKhasteWidget(Widget):
 
     mode = 0 # 0 : Human-vs-Human      1 : Computer-vs-Human
     current = 1 # current player. -1 : black, 1 : white
     started = False #determines whether the game is started or not
+<<<<<<< HEAD
     ended = False #determines if the game is ended
     random = False #if the level is random...
     board = Board() #the game board
     AI_engine = Easy_AI()#TODO: after we get our diverse AIs, we should be able to select one.
 
+=======
+    random = False #if the level is random...
+    board = Board() #the game board
+    AI_engine = Normal_AI()#TODO: after we get our diverse AIs, we should be able to select one.
+ 
+>>>>>>> cf721f812894464b1b94b56e9536f36df1626809
     def end_game(self): #TODO: a screen proclaiming the winner and the scores
         self.canvas.clear()
         with self.canvas:            
