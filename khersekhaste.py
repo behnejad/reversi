@@ -12,10 +12,25 @@ from board import Board, move_string, print_moves
 
 # a simple solution for the data. not the brightest one. anyone who wants
 # something else should do it himself.
-
+        
+        
 class RandomEngine:
-    def moving(self, board, color):#time_remaining=None, time_opponent=None)
+    def moving(self, board, color):
         return random.choice(board.get_legal_moves(color))
+
+class Easy_AI:
+    def moving(self, board, color):
+        l = board.get_legal_moves(color)
+        for i in l:
+            if i == (0,0):
+                return (0,0)
+            if i == (0,7):
+                return (0,7)
+            if i == (7,7):
+                return (7,7)
+            if i == (7,0):
+                return (7,0)
+        return random.choice(l)
 
 class KherseKhasteWidget(Widget):
 
@@ -25,7 +40,7 @@ class KherseKhasteWidget(Widget):
     level = 0 #current level
     random = False #if the level is random...
     board = Board() #the game board
-    AI_engine = RandomEngine() #!!
+    AI_engine = Easy_AI()#RandomEngine() #!!
 	
     def get_AI_next_move(self, engine, board, color):
         return engine.moving(board,color)
