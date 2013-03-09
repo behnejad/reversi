@@ -9,6 +9,7 @@ from kivy.uix.widget import Widget
 from kivy.graphics import Color, Ellipse, Line, Rectangle
 from kivy.properties import ObjectProperty
 from board import Board, move_string, print_moves
+from kivy.uix.image import Image
 
 
 class RandomEngine:
@@ -34,13 +35,15 @@ class KherseKhasteWidget(Widget):
     mode = 0 # 0 : Human-vs-Human      1 : Computer-vs-Human
     current = 1 # current player. -1 : black, 1 : white
     started = False #determines whether the game is started or not
-    level = 0 #current level
+    ended = False #determines if the game is ended
     random = False #if the level is random...
     board = Board() #the game board
     AI_engine = Easy_AI()#TODO: after we get our diverse AIs, we should be able to select one.
- 
+
     def end_game(self): #TODO: a screen proclaiming the winner and the scores
-        exit()
+        self.canvas.clear()
+        with self.canvas:            
+            Image(source = 'test.jpg')
 	
     def get_AI_next_move(self, engine, board, color):
         return engine.moving(board, color, self.board.get_legal_moves(color))
@@ -89,7 +92,7 @@ class KherseKhasteWidget(Widget):
             if ((x, y) in self.board.get_legal_moves(self.current)):
                 self.board.execute_move((x, y), self.current)
                 if (len(self.board.get_legal_moves(1)) == 0 and len(self.board.get_legal_moves(-1)) == 0):
-                    exit()
+                    self.end_game()
                 self.update_screen()
                 if (len(self.board.get_legal_moves(-self.current)) != 0): #we must make sure that the AI will be able to excute a move before assigning the game 
                     self.current = - self.current
