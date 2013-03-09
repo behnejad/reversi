@@ -3,6 +3,7 @@ kivy.require('1.1.1')
 
 import copy
 import random
+from copy import deepcopy
 from kivy.app import App
 from kivy.uix.widget import Widget
 from kivy.graphics import Color, Ellipse, Line, Rectangle
@@ -10,17 +11,13 @@ from kivy.properties import ObjectProperty
 from board import Board, move_string, print_moves
 
 
-# a simple solution for the data. not the brightest one. anyone who wants
-# something else should do it himself.
-        
-        
 class RandomEngine:
-    def moving(self, board, color):
-        return random.choice(board.get_legal_moves(color))
+    def moving(self, board, color, moves):
+        return random.choice(moves)
 
 class Easy_AI:
-    def moving(self, board, color):
-        l = board.get_legal_moves(color)
+    def moving(self, board, color, moves):
+        l = moves
         for i in l:
             if i == (0,0):
                 return (0,0)
@@ -40,17 +37,20 @@ class KherseKhasteWidget(Widget):
     level = 0 #current level
     random = False #if the level is random...
     board = Board() #the game board
-    AI_engine = Easy_AI()#RandomEngine() #!!
+    AI_engine = Easy_AI()#TODO: after we get our diverse AIs, we should be able to select one.
+ 
+    def end_game(self): #TODO: a screen proclaiming the winner and the scores
+        exit()
 	
     def get_AI_next_move(self, engine, board, color):
-        return engine.moving(board,color)
+        return engine.moving(board, color, self.board.get_legal_moves(color))
 	
     def update_screen(self):
         '''updated the screen'''
-        #we redraw everything at each update so that the game can support them rotation of the device
+        #we redraw everything at each update so that the game can support the rotation of the device
         with self.canvas:
             self.canvas.clear()
-            #TODO: this is just a placeholder. load the board from an image file. --- Reza ---
+            #TODO: --- Reza --- this is just a placeholder. load the board from an image file. --- Reza ---
             for j in range(7,-1,-1):
                 for i in range(8):
                     Color(0.2, 0.85, 0.2)
@@ -58,42 +58,50 @@ class KherseKhasteWidget(Widget):
                     (i * self.size[0] / 8.0), self.pos[1] + 2 + (j * self.size[1] / 8.0)]
                     , size=[self.size[0] / 8.0 - 4, self.size[1] / 8.0 - 4])
                     if (self.board[i][j] == 1):
-                        Color(0.9, 0.9, 0.9)
+                        Color(0.9, 0.9, 0.9) #White
                         Ellipse(pos=[self.pos[0] + 2 + (i * self.size[0] / 8.0),
                                      self.pos[1] + 2 + (j * self.size[1] / 8.0)]
                                     , size=[self.size[0] / 8.0 - 4, self.size[1] / 8.0 - 4])
                     elif (self.board[i][j] == -1):
-                        Color(0.1, 0.1, 0.1)
+                        Color(0.1, 0.1, 0.1) #Black
                         Ellipse(pos=[self.pos[0] + 2 + (i * self.size[0] / 8.0),
                                      self.pos[1] + 2 + (j * self.size[1] / 8.0)]
                                     , size=[self.size[0] / 8.0 - 4, self.size[1] / 8.0 - 4])
-
+                    if ((i, j) in self.board.get_legal_moves(self.current)):
+                        Color(0.3, 0.9, 0.3) #Legal moves
+                        Ellipse(pos=[self.pos[0] + 2 + (i * self.size[0] / 8.0),
+                                     self.pos[1] + 2 + (j * self.size[1] / 8.0)]
+                                    , size=[self.size[0] / 8.0 - 4, self.size[1] / 8.0 - 4])
+                        
     def translate_touch(self, touch):
+        '''returning the proper behaviour after we touched the screen'''
         x = int (touch.x / self.size[0] * 8.0)
         y = int (touch.y / self.size[1] * 8.0)
         if (self.mode == 0): #both are humans
             if ((x, y) in self.board.get_legal_moves(self.current)):
                 self.board.execute_move((x, y), self.current)
                 if (len(self.board.get_legal_moves(1)) == 0 and len(self.board.get_legal_moves(-1)) == 0):
-                    exit()
+                    self.end_game()
                 if (len(self.board.get_legal_moves(-self.current)) != 0):
                     self.current = - self.current
                 self.update_screen()
-        elif(self.mode == 1):
+        elif (self.mode == 1): #one is AI
             if ((x, y) in self.board.get_legal_moves(self.current)):
                 self.board.execute_move((x, y), self.current)
                 if (len(self.board.get_legal_moves(1)) == 0 and len(self.board.get_legal_moves(-1)) == 0):
                     exit()
-                if (len(self.board.get_legal_moves(-self.current)) != 0):
-                    self.current = - self.current
                 self.update_screen()
-                while 1:
+                if (len(self.board.get_legal_moves(-self.current)) != 0): #we must make sure that the AI will be able to excute a move before assigning the game 
+                    self.current = - self.current
+                else:
+                    return
+                while 1:# do this until human player has moves available
                     self.board.execute_move(self.get_AI_next_move(self.AI_engine, self.board, (-1)), self.current)
                     if (len(self.board.get_legal_moves(1)) == 0 and len(self.board.get_legal_moves(-1)) == 0):
-                        exit()
-                    self.update_screen()
+                        self.end_game()
                     if (len(self.board.get_legal_moves(-self.current)) != 0):
                         self.current = - self.current
+                        self.update_screen()
                         break
 
     
