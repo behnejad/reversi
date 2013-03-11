@@ -66,18 +66,11 @@ class KherseKhasteWidget(Widget):
     mode = 0 # 0 : Human-vs-Human      1 : Computer-vs-Human
     current = 1 # current player. -1 : black, 1 : white
     started = False #determines whether the game is started or not
-<<<<<<< HEAD
     ended = False #determines if the game is ended
-    random = False #if the level is random...
-    board = Board() #the game board
-    AI_engine = Easy_AI()#TODO: after we get our diverse AIs, we should be able to select one.
-
-=======
     random = False #if the level is random...
     board = Board() #the game board
     AI_engine = Normal_AI()#TODO: after we get our diverse AIs, we should be able to select one.
  
->>>>>>> cf721f812894464b1b94b56e9536f36df1626809
     def end_game(self): #TODO: a screen proclaiming the winner and the scores
         self.canvas.clear()
         with self.canvas:            
